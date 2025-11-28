@@ -3,11 +3,44 @@ from PIL import Image
 import cv2
 import os
 import torch
+import torch.nn as nn
 import torchvision.transforms as T
-from train_maps_net import SimpleCNN   # или откуда у тебя модель
 import numpy as np
 from pathlib import Path
 import recognition_utils
+
+class SimpleCNN(nn.Module):
+    def __init__(self, num_classes, input_width, input_height):
+        super(SimpleCNN, self).__init__()
+
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * (input_height // 8) * (input_width // 8), 256),
+            nn.ReLU(),
+            nn.Linear(256, num_classes)
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.classifier(x)
+        return x
 
 REGION_WIDTH = 400
 REGION_HEIGHT = 100
@@ -209,6 +242,12 @@ def recognize_map(img, map_box, debug):
         pred_idx = out.argmax(dim=1).item()
         pred_name = classes[pred_idx]
         confidence = torch.softmax(out, dim=1)[0, pred_idx].item()
+
+    print(pred_name)
+    if pred_name == "Belles Rock_en":
+        pred_name = "Belle's Rock_en"
+    elif pred_name == "Belles Rock_ru":
+        pred_name = "Belle's Rock_ru"
 
     if debug:
         end = time.time()

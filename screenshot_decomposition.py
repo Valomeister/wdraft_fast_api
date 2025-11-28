@@ -1,19 +1,24 @@
 import cv2
 from pathlib import Path
 import recognize_bans_cnn, recognize_picks_cnn, recognize_map_cnn
+import numpy as np
+
 # {'map': {'name': 'Dry Season', 'lang': 'ru'},
 # 'picks': {'team_blue': ['GENE', 'MAX'], 'team_red': ['MR. P', 'GUS']},
 # 'bans': {'team_blue': ['MINA', 'BELLE', 'GUS'], 'team_red': ['GUS', 'OLLIE', 'MINA']}}
-def decompose_screenshot(screenshot_path):
-    img = cv2.imread(screenshot_path)
+def decompose_screenshot(file_bytes):
+    # Преобразуем байты в numpy array
+    nparr = np.frombuffer(file_bytes, np.uint8)
+    # Декодируем изображение
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     h, w = img.shape[:2]
 
     bans = recognize_bans_cnn.screenshot_to_banned_brawlers(img, debug=True)
     picks = recognize_picks_cnn.screenshot_to_picked_brawlers(img, debug=True)
     map = recognize_map_cnn.screenshot_to_map(img, debug=True)
 
-    if True:
-        cv2.imshow(screenshot_path, img)
+    if False:
+        cv2.imshow("Эщкере", img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -70,12 +75,3 @@ def decompose_screenshot(screenshot_path):
     return decomposition_info, img
 
 
-if __name__ == "__main__":
-    screenshots_folder = Path("screenshots")
-
-    screenshots = [str(f) for f in screenshots_folder.glob("*") if f.is_file()]
-
-    for screenshot_path in screenshots:
-        img = cv2.imread(screenshot_path)
-
-        print(decompose_screenshot(screenshot_path))

@@ -1,8 +1,11 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import JSONResponse
+from fastapi.responses import StreamingResponse
 from PIL import Image
 import io
 import numpy as np
+import json
+
+from torch.serialization import MAP_SHARED
 
 import static_data, MCTS
 from screenshot_decomposition import decompose_screenshot
@@ -10,14 +13,14 @@ from screenshot_decomposition import decompose_screenshot
 app = FastAPI()
 
 def format_screenshot_info(screenshot_info):
-    map = screenshot_info['map']['name']
-    mode = static_data.MODES_FOR_MAPS[map]
+    screenshot_map = screenshot_info['map']['name']
+    mode = static_data.MODES_FOR_MAPS["Belles Rock"]
     teamA = screenshot_info['picks']['team_blue']
     teamB = screenshot_info['picks']['team_red']
 
     match = {
         "mode": mode,
-        "map": map,
+        "map": screenshot_map,
         "teams": [
             teamA,
             teamB
@@ -36,23 +39,23 @@ def format_screenshot_info(screenshot_info):
 
     return match, bans_mask
 
-
-def get_readable_mcts_prediction(match, searches, bans_mask, n):
-    probs, val = MCTS.get_mcts_results([match], searches, bans_mask)
-    top_n = MCTS.top_n_brawlers(probs, n)
-    readable = "Топ драфтов:\n" + "\n".join([f"{pos}. {static_data.BRAWLERS[idx]}" for pos, idx in top_n])
-    return readable
-
-
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
-    # читаем файл
+async def process_screenshot(file: UploadFile = File(...)):
+    print("process_screenshot()")
+
     content = await file.read()
-    image = Image.open(io.BytesIO(content))
+    screenshot_info, debug_img = decompose_screenshot(content)
+    match, bans_mask = format_screenshot_info(screenshot_info)
 
-    # !!! здесь вызываешь свой MCTS + модель !!!
-    # result = your_model.process(image)
+    if len(match["teams"][0]) > len(match["teams"][1]):
+        match["teams"][0], match["teams"][1] = match["teams"][1], match["teams"][0]
 
-    result = {"status": "ok", "dummy": 123}  # тестовый ответ
+    def event_stream():
+        # сначала отправляем распознавание
+        yield json.dumps({"type": "screenshot_info", "data": screenshot_info}) + "\n"
+        # потом постепенно MCTS
+        for mcts_result in MCTS.get_mcts_results([match], 10_000, bans_mask):
+            # сериализация каждого словаря
+            yield json.dumps({"type": "mcts", "data": mcts_result}) + "\n"
 
-    return JSONResponse(result)
+    return StreamingResponse(event_stream(), media_type="text/event-stream")

@@ -95,10 +95,7 @@ class PrimitiveMCTS:
         cur_moves_count = self.game.get_moves_count(state)
         root = PrimitiveNode(self.game, self.args, state, moves_count=cur_moves_count)
 
-        for search in range(self.args['num_searches']):
-            if search != 0 and search % 1_000 == 0:
-                # print(f"{search / self.args['num_searches'] * 100:.2f}%")
-                pass
+        for search in range(self.args['num_searches'] + 1):
             node = root
 
             while node.is_fully_expanded():
@@ -115,14 +112,30 @@ class PrimitiveMCTS:
 
             node.backpropagate(value)
 
+            # yield прогресса каждые 1000 шагов
+            if search != 0 and search % 1_000 == 0:
+                action_probs = np.zeros(self.game.action_size)
+                for child in root.children:
+                    action_probs[child.action_taken] = child.visit_count
+                action_probs /= np.sum(action_probs)
+                avg_value = root.value_sum / root.visit_count
+                yield {
+                    "step": search,
+                    "action_probs": action_probs_to_dict(action_probs),
+                    "avg_value": float(avg_value)
+                }
+
         action_probs = np.zeros(self.game.action_size)
         for child in root.children:
             action_probs[child.action_taken] = child.visit_count
         action_probs /= np.sum(action_probs)
 
-        return action_probs, root.value_sum / root.visit_count, root
 
+def action_probs_to_dict(action_probs):
+    probs_list = action_probs.tolist() if hasattr(action_probs, "tolist") else list(action_probs)
+    result = {static_data.BRAWLERS[i]: probs_list[i] for i in range(len(probs_list)) if i < len(static_data.BRAWLERS)}
 
+    return result
 
 
 def get_mcts_results(matches_data, n_searches, bans_mask):
@@ -142,9 +155,9 @@ def get_mcts_results(matches_data, n_searches, bans_mask):
         'map_name': maps_names[0]
     }
     mcts = PrimitiveMCTS(draft, args)
-    probs, val, mcts_root = mcts.search(neutral_state)
 
-    return probs, val
+    for result in mcts.search(neutral_state):
+        yield result
 
 def top_n_brawlers(probs, n):
     top_indices = np.argsort(probs)[::-1][:n]

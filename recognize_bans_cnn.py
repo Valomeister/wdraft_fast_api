@@ -2,9 +2,54 @@ import time
 import cv2
 import recognition_utils
 import torch
+import torch.nn as nn
 import torchvision.transforms as T
-from train_bans_net import IconNet
 from pathlib import Path
+
+class IconNet(nn.Module):
+    def __init__(self, num_classes, dropout_prob=0.3):
+        super().__init__()
+
+        # Свёрточные блоки с BatchNorm
+        self.conv = nn.Sequential(
+            nn.Conv2d(3, 64, 3, padding=1),  # 55 → 55
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2),                 # 55 → 27
+
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.Conv2d(128, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(2),                 # 27 → 13
+
+            nn.Conv2d(128, 256, 3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.MaxPool2d(2, padding=1)       # 13 → 7
+        )
+
+        # Полносвязные слои с Dropout
+        self.fc = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(256 * 7 * 7, 512),
+            nn.ReLU(),
+            # nn.Dropout(dropout_prob),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            # nn.Dropout(dropout_prob),
+            nn.Linear(256, num_classes)
+        )
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.fc(x)
+        return x
 
 IMG_SIZE = 55
 

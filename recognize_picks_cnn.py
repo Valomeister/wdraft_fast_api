@@ -1,13 +1,48 @@
 import time
 
 import recognition_utils
-from train_picks_net import SimpleCNN
 import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
+import torch.nn as nn
 from torchvision import transforms
 from pathlib import Path
+
+CNN_INPUT_SIZE = 125  # размер входа CNN
+
+class SimpleCNN(nn.Module):
+    def __init__(self, num_classes):
+        super(SimpleCNN, self).__init__()
+
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(128 * (CNN_INPUT_SIZE // 8) * (CNN_INPUT_SIZE // 8), 256),
+            nn.ReLU(),
+            nn.Linear(256, num_classes)
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.classifier(x)
+        return x
 
 # --- Настройки ---
 IMG_SIZE = 125
@@ -16,6 +51,7 @@ REGION_SIZE = 180
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 checkpoint = torch.load("models/character_cnn.pth", map_location=device)
 classes = checkpoint["classes"]
+
 num_classes = len(classes)
 
 model = SimpleCNN(num_classes)
