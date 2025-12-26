@@ -61,7 +61,7 @@ model = IconNet(num_classes)
 model.load_state_dict(checkpoint["model"])
 model.eval()
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 model.to(device)
 
 transform = T.Compose([
@@ -72,6 +72,8 @@ transform = T.Compose([
 
 ban_templates = ["templates/bans/ban_blue.png",
                   "templates/bans/ban_red.png",
+                  "templates/bans/ban_blue_ipad.png",
+                  "templates/bans/ban_red_ipad.png",
                   "templates/bans/ban_blue_wide_screen.png",
                   "templates/bans/ban_red_wide_screen.png",
                   "templates/bans/ban_blue_misteffa.jpg",

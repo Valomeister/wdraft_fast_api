@@ -75,7 +75,7 @@ model = SimpleCNN(num_classes, REGION_WIDTH, REGION_HEIGHT)
 model.load_state_dict(checkpoint["model"])
 model.eval()
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 model.to(device)
 
 transform = T.Compose([

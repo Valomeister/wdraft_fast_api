@@ -2,6 +2,36 @@ import numpy as np
 from BrawlDraft import BrawlDraft
 import static_data
 
+def get_state_from_match(match):
+
+    state = np.zeros(static_data.BRAWLER_LEN)
+    mode_name = match['mode']
+    map_name = match['map']
+    result = match.get('result')
+    teams = match['teams']
+
+    if not mode_name in static_data.MODES or not map_name in static_data.MAPS:
+        return
+
+    team1_brawlers = teams[0]
+    team2_brawlers = teams[1]
+
+    # --- Кодирование Team 1 (Multi-Hot) ---
+    team1_vector = np.zeros(static_data.BRAWLER_LEN, dtype=np.int8)
+    for brawler in team1_brawlers:
+        brawler_idx = static_data.BRAWLERS.index(brawler)
+        team1_vector[brawler_idx] = 1
+
+    # --- Кодирование Team 2 (Multi-Hot) ---
+    team2_vector = np.zeros(static_data.BRAWLER_LEN, dtype=np.int8)
+    for brawler in team2_brawlers:
+        brawler_idx = static_data.BRAWLERS.index(brawler)
+        team2_vector[brawler_idx] = -1
+
+    # [1, 0, 0] + [0, 0, -1] => [1, 0, -1]
+    state = team1_vector + team2_vector
+
+    return state, mode_name, map_name
 
 def get_encoded_state(states, mode_names, map_names):
     encoded_state_size = static_data.MODE_LEN + static_data.MAP_LEN + static_data.BRAWLER_LEN * 3

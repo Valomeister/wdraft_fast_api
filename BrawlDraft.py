@@ -52,9 +52,11 @@ class BrawlDraft:
 
     def get_valid_moves(self, state):
         actual_brawler_count = len(static_data.BRAWLERS)
-        valid_moves = (state == 0).astype(np.int8)
-        valid_moves[actual_brawler_count:] = 0
-        return valid_moves
+        valid_moves_mask = (state == 0).astype(np.int8)
+        valid_moves_mask[actual_brawler_count:] = 0
+        valid_moves_indices = np.flatnonzero(valid_moves_mask).tolist()
+        np.random.shuffle(valid_moves_indices)
+        return valid_moves_indices
 
     def is_terminated(self, move_count):
         assert 0 <= move_count <= 6

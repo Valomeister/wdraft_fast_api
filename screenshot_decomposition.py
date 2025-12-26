@@ -3,21 +3,31 @@ from pathlib import Path
 import recognize_bans_cnn, recognize_picks_cnn, recognize_map_cnn
 import numpy as np
 
+import static_data
+
+
 # {'map': {'name': 'Dry Season', 'lang': 'ru'},
 # 'picks': {'team_blue': ['GENE', 'MAX'], 'team_red': ['MR. P', 'GUS']},
 # 'bans': {'team_blue': ['MINA', 'BELLE', 'GUS'], 'team_red': ['GUS', 'OLLIE', 'MINA']}}
-def decompose_screenshot(file_bytes):
+def decompose_screenshot(file_bytes, debug=False):
     # Преобразуем байты в numpy array
     nparr = np.frombuffer(file_bytes, np.uint8)
     # Декодируем изображение
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     h, w = img.shape[:2]
 
-    bans = recognize_bans_cnn.screenshot_to_banned_brawlers(img, debug=True)
-    picks = recognize_picks_cnn.screenshot_to_picked_brawlers(img, debug=True)
-    map = recognize_map_cnn.screenshot_to_map(img, debug=True)
+    target_width = 1280
+    if w > target_width:
+        scale = target_width / w
+        new_h = int(h * scale)
+        img = cv2.resize(img, (target_width, new_h), interpolation=cv2.INTER_AREA)
+        h, w = img.shape[:2]
 
-    if False:
+    bans = recognize_bans_cnn.screenshot_to_banned_brawlers(img, debug=debug)
+    picks = recognize_picks_cnn.screenshot_to_picked_brawlers(img, debug=debug)
+    map = recognize_map_cnn.screenshot_to_map(img, debug=debug)
+
+    if debug:
         cv2.imshow("Эщкере", img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
@@ -45,6 +55,8 @@ def decompose_screenshot(file_bytes):
             "name": map[1][:-3],
             "lang": map[1][-2:]
         }
+
+        decomposition_info["mode"] = static_data.MODES_FOR_MAPS[decomposition_info["map"]["name"].replace("'", "")]
 
     if picks:
         picks_blue = []

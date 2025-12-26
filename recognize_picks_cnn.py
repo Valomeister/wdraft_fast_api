@@ -48,7 +48,7 @@ class SimpleCNN(nn.Module):
 IMG_SIZE = 125
 REGION_SIZE = 180
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 checkpoint = torch.load("models/character_cnn.pth", map_location=device)
 classes = checkpoint["classes"]
 
