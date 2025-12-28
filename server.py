@@ -1,3 +1,4 @@
+import math
 from io import BytesIO
 
 from fastapi import FastAPI, UploadFile, File, Form
@@ -14,6 +15,14 @@ import static_data, MCTS
 from screenshot_decomposition import decompose_screenshot
 
 app = FastAPI()
+
+def get_brawler_filename(brawler_label):
+    label_lower = brawler_label.lower()
+    result = (label_lower.replace("-", "_").replace(". ", "_")
+              .replace(" ", "_").replace("&", "and").replace(".", "_"))
+    result += '.webp'
+
+    return result
 
 def format_screenshot_info(screenshot_info):
     screenshot_map = screenshot_info['map']['name']
@@ -76,7 +85,7 @@ async def handle_image(file: UploadFile = File(...), detail: int | None = Form(N
     # читаем байты
     content = await file.read()
 
-    screenshot_info, debug_img = decompose_screenshot(content, True)
+    screenshot_info, debug_img = decompose_screenshot(content, False)
     match, bans_mask = format_screenshot_info(screenshot_info)
 
     raw_results = GreedySearch.get_greedy_search_results(match, bans_mask)
@@ -85,57 +94,30 @@ async def handle_image(file: UploadFile = File(...), detail: int | None = Form(N
     max_action_probs = raw_results["max_action_probs"]
     avg_value = raw_results["avg_value"]
 
-    top_10 = sorted(
+    n = 10
+    rows = 2
+    cols = math.ceil(n / rows)
+    icon_size = 100
+    top_n = sorted(
         action_probs.items(),
         key=lambda x: x[1],
         reverse=True
-    )[:]
+    )[:n]
 
-    lines = []
+    canvas = Image.new("RGB", (cols * icon_size, rows * icon_size), "white")
 
-    if detail == 1:
-        lines.append(', '.join([i[0] for i in top_10]))
+    for i, (brawler, prob) in enumerate(top_n):
+        row = i // cols
+        col = i % cols
+        icon_filename = get_brawler_filename(brawler)
+        icon_path = f"brawlers_icons_medium/{icon_filename}"
+        icon = Image.open(icon_path).convert("RGB")
+        canvas.paste(icon, (col * icon_size, row * icon_size))
 
-    if detail >= 2:
-        for i, (name, prob) in enumerate(top_10, start=1):
-            index_part = str(i) + "." + ' ' * (4 - len(str(i)))
-            brawler_part = name
-            prob_part = f"   ({prob / max_action_probs * 100:.0f}%)"
-            lines.append(index_part + brawler_part + prob_part)
-
-    if detail >= 3:
-        lines.append("")
-        cur_turn = get_turn_from_match(match)
-        print(match)
-        scaled_val = avg_value + 1 / 2
-        if cur_turn == 1:
-            blue_val = scaled_val
-        else:
-            blue_val = 1 - scaled_val
-        red_val = 1 - blue_val
-        lines.append(f"VICTORY: {blue_val*100:.0f}% vs {red_val*100:.0f}%")
-
-    if detail >= 4:
-        lines.append("")
-        debug_info = ''
-        debug_info += f"{screenshot_info["mode"]}, {screenshot_info["map"]["name"]}\n"
-        debug_info += f"{', '.join(screenshot_info["picks"]["team_blue"])}  vs  {', '.join(screenshot_info["picks"]["team_red"])}\n"
-        debug_info += f"Bans: {', '.join(screenshot_info["bans"]["team_blue"])} + {', '.join(screenshot_info["bans"]["team_red"])}\n"
-        lines.append(debug_info)
-
-    result_str = "\n".join(lines)
-
-    print(result_str)
-
-    IMAGE_PATH = "sample_output.jpg"  # ← путь к фото на ПК
-
-    # 1. Открываем изображение
-    img = Image.open(IMAGE_PATH)
-    img = img.convert("RGB")
 
     # 3. Сохраняем в память
     buf = BytesIO()
-    img.save(buf, format="JPEG", quality=85)
+    canvas.save(buf, format="JPEG", quality=100)
     buf.seek(0)
 
     return StreamingResponse(

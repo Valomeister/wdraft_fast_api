@@ -68,7 +68,6 @@ def greedy_search(state, mode_name, map_name):
     action_probs = np.zeros(game.action_size)
     for i in range(len(valid_moves)):
         action_probs[valid_moves[i]] = results[valid_moves[i]]
-    action_probs /= np.sum(action_probs)
 
     return {
         "action_probs": action_probs_to_dict(action_probs),
