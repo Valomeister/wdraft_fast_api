@@ -87,3 +87,12 @@ def put_text_with_background(img, text, position, font_face=cv2.FONT_HERSHEY_SIM
     cv2.putText(img, text, (x, y), font_face, font_scale, text_color, thickness, line_type)
 
     return img
+
+def get_bottom_section_h(img):
+    h, w = img.shape[:2]
+    if h > 710:
+        bottom_section_h = 227
+    else:
+        bottom_section_h = 0.3156 * h
+
+    return bottom_section_h

@@ -14,6 +14,8 @@ BRAWLERS = ['SHELLY', 'COLT', 'BULL', 'BROCK', 'RICO', 'SPIKE', 'BARLEY',
             'SHADE', 'JUJU', 'MEEPLE', 'OLLIE', 'LUMI', 'FINX',
             'JAE-YONG', 'KAZE', 'ALLI', 'TRUNK', 'MINA']
 
+BRAWLERS_IDXS = {BRAWLERS[i]: i for i in range(len(BRAWLERS))}
+
 MODES = ['bounty', 'hotZone', 'knockout', 'brawlBall', 'heist', 'gemGrab']
 
 MAPS = ["Belle's Rock", 'Bridge Too Far', 'Center Stage',
@@ -52,6 +54,24 @@ MAPS_FOR_MODES = {
 MODES_FOR_MAPS = {map_name: mode for mode, maps in MAPS_FOR_MODES.items() for map_name in maps}
 
 RESULTS = ['victory', 'defeat', 'draw']
+
+MODES_RU = {
+    "bounty": "НАГРАДА ЗА ПОИМКУ",
+    "hotZone": "ГОРЯЧАЯ ЗОНА",
+    "knockout": "НОКАУТ",
+    "brawlBall": "БРОУЛБОЛЛ",
+    "heist": "ОГРАБЛЕНИЕ",
+    "gemGrab": "ЗАХВАТ КРИСТАЛЛОВ",
+}
+
+MODES_EN = {
+    "bounty": "BOUNTY",
+    "hotZone": "HOT ZONE",
+    "knockout": "KNOCKOUT",
+    "brawlBall": "BRAWL BALL",
+    "heist": "HEIST",
+    "gemGrab": "GEM GRAB",
+}
 
 MAPS_RU = {
     "Belle's Rock": "Живописный утес",

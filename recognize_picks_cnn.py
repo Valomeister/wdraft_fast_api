@@ -98,14 +98,6 @@ def non_max_suppression(boxes, overlapThresh):
         idxs = idxs[overlap <= overlapThresh]
     return boxes[pick].astype(int)
 
-def get_bottom_section_h(img):
-    h, w = img.shape[:2]
-    if h > 710:
-        bottom_section_h = 227
-    else:
-        bottom_section_h = 0.3156 * h
-
-    return bottom_section_h
 
 
 def find_crude_icon_boxes(img, tick_boxes, debug):
@@ -113,7 +105,7 @@ def find_crude_icon_boxes(img, tick_boxes, debug):
 
     h, w = img.shape[:2]
 
-    bottom_section_h = get_bottom_section_h(img)
+    bottom_section_h = recognition_utils.get_bottom_section_h(img)
     icon_size = 0.515 * bottom_section_h
 
     cv2.rectangle(img, (0, h - round(bottom_section_h)), (w, h - round(bottom_section_h)), (0, 255, 0), 2)
@@ -184,7 +176,7 @@ def recognize_brawlers(img, icon_boxes, debug):
 def screenshot_to_picked_brawlers(img, debug):
     h, w = img.shape[:2]
 
-    start_y = h - round(get_bottom_section_h(img))
+    start_y = h - round(recognition_utils.get_bottom_section_h(img))
     tick_boxes = recognition_utils.find_templates(img, tick_templates, threshold, start_y, debug=debug)
 
     # icon_boxes = get_icon_boxes(img, tick_boxes, debug=debug)

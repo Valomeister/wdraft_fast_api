@@ -3,6 +3,7 @@ from pathlib import Path
 import recognize_bans_cnn, recognize_picks_cnn, recognize_map_cnn
 import numpy as np
 
+import recognize_turn
 import static_data
 
 
@@ -29,6 +30,7 @@ def decompose_screenshot(file_bytes, debug=False):
     bans = recognize_bans_cnn.screenshot_to_banned_brawlers(img, debug=debug)
     picks = recognize_picks_cnn.screenshot_to_picked_brawlers(img, debug=debug)
     map = recognize_map_cnn.screenshot_to_map(img, debug=debug)
+    turn = recognize_turn.screenshot_to_turn(img,debug=debug)
 
     if debug:
         cv2.imshow("Эщкере", img)
@@ -47,10 +49,10 @@ def decompose_screenshot(file_bytes, debug=False):
             "team_blue": [],
             "team_red": []
         },
-        "bans": {
-            "team_blue": [],
-            "team_red": []
-        }
+        "bans": [
+            [], []
+        ],
+        "turn": turn
     }
 
     if map:
@@ -79,13 +81,11 @@ def decompose_screenshot(file_bytes, debug=False):
         }
 
     if bans:
-        bans_blue = [ban[1] for ban in bans[::2]]
-        bans_red = [ban[1] for ban in bans[1::2]]
+        print(bans)
+        bans_blue = [ban[1] for ban in bans if ban[0][0] < w / 2]
+        bans_red = [ban[1] for ban in bans if ban[0][0] > w / 2]
 
-        decomposition_info["bans"] = {
-            "team_blue": bans_blue,
-            "team_red": bans_red
-        }
+        decomposition_info["bans"] = [bans_blue, bans_red]
 
     return decomposition_info, img
 
