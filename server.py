@@ -21,6 +21,9 @@ def format_screenshot_info(screenshot_info):
     teamA = screenshot_info['picks']['team_blue']
     teamB = screenshot_info['picks']['team_red']
 
+    if len(teamA) > len(teamB):
+        teamA, teamB = teamB, teamA
+
     match = {
         "mode": mode,
         "map": screenshot_map,
@@ -73,7 +76,7 @@ async def handle_image(file: UploadFile = File(...), detail: int | None = Form(N
     # читаем байты
     content = await file.read()
 
-    screenshot_info, debug_img = decompose_screenshot(content, False)
+    screenshot_info, debug_img = decompose_screenshot(content, True)
     match, bans_mask = format_screenshot_info(screenshot_info)
 
     raw_results = GreedySearch.get_greedy_search_results(match, bans_mask)
@@ -86,7 +89,7 @@ async def handle_image(file: UploadFile = File(...), detail: int | None = Form(N
         action_probs.items(),
         key=lambda x: x[1],
         reverse=True
-    )[:10]
+    )[:]
 
     lines = []
 
@@ -124,4 +127,18 @@ async def handle_image(file: UploadFile = File(...), detail: int | None = Form(N
 
     print(result_str)
 
-    return result_str
+    IMAGE_PATH = "sample_output.jpg"  # ← путь к фото на ПК
+
+    # 1. Открываем изображение
+    img = Image.open(IMAGE_PATH)
+    img = img.convert("RGB")
+
+    # 3. Сохраняем в память
+    buf = BytesIO()
+    img.save(buf, format="JPEG", quality=85)
+    buf.seek(0)
+
+    return StreamingResponse(
+        buf,
+        media_type="image/jpeg"
+    )

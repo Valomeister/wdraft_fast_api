@@ -16,6 +16,9 @@ def decompose_screenshot(file_bytes, debug=False):
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     h, w = img.shape[:2]
 
+    if h > w:
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
     target_width = 1280
     if w > target_width:
         scale = target_width / w

@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import torch
 from torch import nn
@@ -16,34 +18,56 @@ model.load_state_dict(torch.load("models/ValueNetwork/value_network_best.pt", ma
 model.eval()
 
 def greedy_search(state, mode_name, map_name):
+    print(game.get_concise_state(state))
     move_count = game.get_moves_count(state)
     valid_moves = sorted(game.get_valid_moves(state))
-    results = {move: {} for move in valid_moves}
-    for move in valid_moves:
-        next_state = game.get_next_state(state.copy(), move, 1)
-        rel_player = game.get_relative_player(move_count + 1)
-        rel_state = game.change_perspective(next_state, player=rel_player)
-        results[move]["child_state"] = game.get_concise_state(rel_state)
+    encoded_states = []
+    for i in range(len(valid_moves)):
+        next_state = game.get_next_state(state.copy(), valid_moves[i], 1)
+        next_rel_player = game.get_relative_player(move_count + 1)
+        next_rel_state = game.change_perspective(next_state, player=next_rel_player)
 
-        encoded_state = game.get_encoded_state(rel_state, mode_name, map_name)
-        results[move]["encoded_child_state"] = encoded_state
+        encoded_state = game.get_encoded_state(next_rel_state, mode_name, map_name)
+        encoded_states.append((game.get_concise_state(next_rel_state), encoded_state))
 
-    encoded_child_states = [results[move]["encoded_child_state"] for move in valid_moves]
-    tensor = torch.tensor(np.array(encoded_child_states), dtype=torch.float)
+        if move_count < 5:
+            for j in range(len(valid_moves)):
+                if i == j:
+                    continue
+                next_next_state = game.get_next_state(next_rel_state.copy(), valid_moves[j], 1)
+                next_next_rel_player = game.get_relative_player(move_count + 2)
+                next_next_rel_state = game.change_perspective(next_next_state, player=next_next_rel_player)
 
+                encoded_state = game.get_encoded_state(next_next_rel_state, mode_name, map_name)
+                encoded_states.append((game.get_concise_state(next_next_rel_state), encoded_state))
+
+    only_encoded_states = [i[1] for i in encoded_states]
+    tensor = torch.tensor(np.array(only_encoded_states), dtype=torch.float)
     with torch.no_grad():
         values = model(tensor)
-
     values = values.squeeze(-1).cpu().numpy()
-    if game.get_relative_player(move_count + 1) == -1:
-        values *= -1
 
-    for i in range(len(values)):
-        results[valid_moves[i]]["value"] = (values[i] + 1) / 2
+    results = np.zeros(game.action_size, dtype=np.float32)
+    for i in range(len(valid_moves)):
+        if move_count < 5:
+            next_value = values[i * (len(valid_moves))]
+        else:
+            next_value = values[i]
+        if game.get_player_from_moves(move_count + 2) != game.get_player_from_moves(move_count + 1):
+            next_value *= -1
+        results[valid_moves[i]] += next_value / len(valid_moves)
+        if move_count < 5:
+            for j in range(len(valid_moves)):
+                if i == j:
+                    continue
+                next_next_value = values[i * (len(valid_moves)) + j]
+                if game.get_player_from_moves(move_count + 3) != game.get_player_from_moves(move_count + 1):
+                    next_next_value *= -1
+                results[valid_moves[i]] += next_next_value / len(valid_moves)
 
     action_probs = np.zeros(game.action_size)
-    for move in valid_moves:
-        action_probs[move] = results[move]["value"]
+    for i in range(len(valid_moves)):
+        action_probs[valid_moves[i]] = results[valid_moves[i]]
     action_probs /= np.sum(action_probs)
 
     return {
@@ -64,14 +88,26 @@ def get_greedy_search_results(match_data, bans_mask):
         state, mode_name, map_name = state_from_match
 
     assert state_from_match
-    neutral_state = state # получаем от клиента сразу neutral
+    neutral_state = state
     min_len = min(len(neutral_state), len(bans_mask))
-    neutral_state[:min_len][bans_mask[:min_len] == 1] = 2
+    neutral_state[:min_len][bans_mask[:min_len] == 1] = 0
 
     return greedy_search(neutral_state, mode_name, map_name)
 
 if __name__ == "__main__":
-    s0 = game.get_initial_state()
-    game.get_next_state(s0, 0, 1)
-    game.get_next_state(s0, 2, -1)
-    greedy_search(s0, "gemGrab", "Hard Rock Mine")
+    # s0 = game.get_initial_state()
+    # game.get_next_state(s0, 0, 1)
+    # game.get_next_state(s0, 2, -1)
+    # greedy_search(s0, "gemGrab", "Hard Rock Mine")
+
+    X = torch.randn(100**2, 390)
+
+    start = time.perf_counter()
+
+    with torch.no_grad():
+        y = model(X)
+
+    end = time.perf_counter()
+
+    print(f"Inference time: {end - start:.6f} sec")
+

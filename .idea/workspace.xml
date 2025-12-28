@@ -5,19 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4895c582-5777-4a0d-b5bd-f3d629e6f2c3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GreedySearch.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ValueNetwork.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/ValueNetwork/value_network_best.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/wdraft_fast_api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wdraft_fast_api.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sample_output.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrawlDraft.py" beforeDir="false" afterPath="$PROJECT_DIR$/BrawlDraft.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/encode_features.py" beforeDir="false" afterPath="$PROJECT_DIR$/encode_features.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/recognize_bans_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/recognize_bans_cnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/recognize_map_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/recognize_map_cnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/recognize_picks_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/recognize_picks_cnn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/screenshot_decomposition.py" beforeDir="false" afterPath="$PROJECT_DIR$/screenshot_decomposition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GreedySearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/GreedySearch.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tmp.py" beforeDir="false" afterPath="$PROJECT_DIR$/tmp.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,31 +33,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.recognize_picks_cnn.executor&quot;: &quot;Run&quot;,
-    &quot;Python.server.executor&quot;: &quot;Run&quot;,
-    &quot;Python.static_data.executor&quot;: &quot;Run&quot;,
-    &quot;Python.tmp.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Valery/Desktop/projects/python/wdraft_fast_api/models/ValueNetowk&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.GreedySearch.executor": "Run",
+    "Python.recognize_picks_cnn.executor": "Run",
+    "Python.server.executor": "Run",
+    "Python.static_data.executor": "Run",
+    "Python.tmp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/Valery/Desktop/projects/python/wdraft_fast_api",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Valery\Desktop\projects\python\wdraft_fast_api\models\ValueNetowk" />
@@ -92,7 +84,10 @@
       <option name="presentableId" value="Default" />
       <updated>1764238635546</updated>
       <workItem from="1766766801617" duration="11023000" />
-      <workItem from="1766791203819" duration="1234000" />
+      <workItem from="1766791203819" duration="1879000" />
+      <workItem from="1766830876408" duration="397000" />
+      <workItem from="1766858893553" duration="164000" />
+      <workItem from="1766882553712" duration="2209000" />
     </task>
     <servers />
   </component>
@@ -101,6 +96,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/wdraft_fast_api$server.coverage" NAME="server Coverage Results" MODIFIED="1766780119035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/wdraft_fast_api$GreedySearch.coverage" NAME="GreedySearch Coverage Results" MODIFIED="1766831175102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/wdraft_fast_api$static_data.coverage" NAME="static_data Coverage Results" MODIFIED="1766768399870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
