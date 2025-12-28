@@ -258,11 +258,36 @@ def remove_illegal_from_probs(action_probs, match, bans_mask):
 
     return processed_action_probs
 
+def validate_layout(layout):
+    good = True
+    if layout is None:
+        good = False
+    elif not len(layout) in [1, 2, 3]:
+        good = False
+    elif max(layout.count('M'), layout.count('S'), layout.count('D')) > 1:
+        good = False
+    elif not set(layout).issubset(set('MSD')):
+        good = False
+
+    return good
 
 @app.post("/predict_ios")
-async def handle_image(file: UploadFile = File(...), detail: int | None = Form(None)):
+async def handle_image(file: UploadFile = File(...),
+                       layout: str | None = Form(None),
+                       theme: str | None = Form(None),
+                       n: int | None = Form(None),
+                       rows: int | None = Form(None),):
     # читаем байты
     content = await file.read()
+    if not validate_layout(layout):
+        layout = "MSD" # map, state, draft
+    if not theme in ["dark", "light"]:
+        theme = "dark"
+    if n is None or n < 6:
+        n = 10
+    if rows is None or rows < 1 or math.ceil(n / rows) < 6:
+        rows = n // 6
+
 
     screenshot_info, debug_img = decompose_screenshot(content, False)
     match, match_neutral, bans_mask, turn = format_screenshot_info(screenshot_info)
@@ -281,17 +306,21 @@ async def handle_image(file: UploadFile = File(...), detail: int | None = Form(N
         reverse=True
     )
 
-    n = 10
-    rows = 1
     cols = math.ceil(n / rows)
     map_info_h = 44
 
-    theme = "dark"
     map_info_canvas = generate_map_info_canvas(match, language=lang, cols=cols, height=map_info_h, theme=theme)
     state_canvas = generate_state_canvas(match, screenshot_info["bans"], turn, cols=cols, theme=theme)
     suggestions_canvas = generate_suggestions_canvas(top_brawlers, n=n, rows=rows)
 
-    result = concat_vertical_pil([map_info_canvas, suggestions_canvas, state_canvas])
+    layout_dict = {
+        'M': map_info_canvas,
+        'S': suggestions_canvas,
+        'D': state_canvas,
+    }
+    layout_arranged = [layout_dict[i] for i in layout]
+
+    result = concat_vertical_pil(layout_arranged)
 
     # 3. Сохраняем в память
     buf = BytesIO()
