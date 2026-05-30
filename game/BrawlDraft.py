@@ -1,7 +1,6 @@
 """
 This module implements the core logic (simulation of logic) of drafting in Brawl Stars
 """
-
 import numpy as np
 import torch
 from torch import nn

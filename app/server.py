@@ -117,9 +117,9 @@ def generate_map_info_canvas(match, cols, language, theme, height, icon_size=100
     draw = ImageDraw.Draw(canvas)
 
     if language == "ru":
-        text = f"{static_data.MODES_RU[match["mode"]]}, {static_data.MAPS_RU[match["map"]]}"
+        text = f"{static_data.MODES_RU[match['mode']]}, {static_data.MAPS_RU[match['mode']]}"
     else:
-        text = f"{static_data.MODES_EN[match["mode"]]}, {match["map"]}"
+        text = f"{static_data.MODES_EN[match['mode']]}, {match['mode']}"
 
     text_color = "black" if theme == "light" else "white"
     draw.text(
