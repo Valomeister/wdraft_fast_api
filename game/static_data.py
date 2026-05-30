@@ -1,3 +1,6 @@
+"""
+This module provides game-related static data as python objects
+"""
 BRAWLERS = ['SHELLY', 'COLT', 'BULL', 'BROCK', 'RICO', 'SPIKE', 'BARLEY',
             'JESSIE', 'NITA', 'DYNAMIKE', 'EL PRIMO', 'MORTIS', 'CROW',
             'POCO', 'BO', 'PIPER', 'PAM', 'TARA', 'DARRYL', 'PENNY',

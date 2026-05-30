@@ -1,13 +1,17 @@
+"""
+This module performs two tasks:
+- locate map box
+- recognize the map in this box
+"""
 import time
-from PIL import Image
 import cv2
-import os
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
 import numpy as np
 from pathlib import Path
-import recognition_utils
+from recognition import recognition_utils
+
 
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes, input_width, input_height):
@@ -67,7 +71,7 @@ modes_normed_color_dict = {
 tgA = 10.71
 
 # ---- загрузка модели ----
-checkpoint = torch.load("models/map_ideal_crop_w_bar.pth", map_location="cpu")
+checkpoint = torch.load("models/map_classifier.pth", map_location="cpu")
 classes = checkpoint["classes"]
 num_classes = len(classes)
 

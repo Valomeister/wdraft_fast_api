@@ -1,10 +1,16 @@
+"""
+This module performs two tasks:
+- locate ban boxes
+- recognize the brawlers in those boxes
+"""
 import time
 import cv2
-import recognition_utils
+from recognition import recognition_utils
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
 from pathlib import Path
+
 
 class IconNet(nn.Module):
     def __init__(self, num_classes, dropout_prob=0.3):
@@ -53,7 +59,7 @@ class IconNet(nn.Module):
 
 IMG_SIZE = 55
 
-checkpoint = torch.load("models/icon_randomcrop_model.pth", map_location="cpu")
+checkpoint = torch.load("models/ban_classifier.pth", map_location="cpu")
 classes = checkpoint["classes"]
 num_classes = len(classes)
 

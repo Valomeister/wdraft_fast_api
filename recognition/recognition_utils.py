@@ -1,3 +1,6 @@
+"""
+This module provides utility functions used for screenshot recognition and decomposition
+"""
 import time
 
 import cv2

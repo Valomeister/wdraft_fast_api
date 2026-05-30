@@ -1,9 +1,12 @@
+"""
+This module is used to transform matches data from JSON to one-hot vector
+"""
 import numpy as np
-from BrawlDraft import BrawlDraft
-import static_data
+from game.BrawlDraft import BrawlDraft
+from game import static_data
+
 
 def get_state_from_match(match):
-
     state = np.zeros(static_data.BRAWLER_LEN)
     mode_name = match['mode']
     map_name = match['map']

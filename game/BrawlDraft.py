@@ -1,12 +1,14 @@
-import random
+"""
+This module implements the core logic (simulation of logic) of drafting in Brawl Stars
+"""
 
 import numpy as np
 import torch
 from torch import nn
 
-import static_data
+from . import static_data
 
-# Определяем архитектуру (должна совпадать с той, что при обучении)
+
 class SimpleNN(nn.Module):
     def __init__(self, input_size):
         super().__init__()
@@ -20,12 +22,12 @@ class SimpleNN(nn.Module):
     def forward(self, x):
         return self.net(x)
 
+
 # Размер входа должен совпадать с X.shape[1]
 input_size = static_data.MODE_LEN + static_data.MAP_LEN + 3 * static_data.BRAWLER_LEN
 model = SimpleNN(input_size)
 
-# # Загружаем веса
-MODEL_PATH = "models/WDetermine_best.pt"
+MODEL_PATH = "models/draft_evaluator.pt"
 model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
 model.eval()
 
@@ -161,6 +163,9 @@ class BrawlDraft:
         return neutral_state
 
 if __name__ == "__main__":
+    # Just random testing
+
+
     draft = BrawlDraft()
 
     # state = np.zeros(94)
@@ -177,9 +182,6 @@ if __name__ == "__main__":
     mode_name = np.array(['knockout'])
     map_name = np.array(["Belle's Rock"])
 
-
-
-
     state = draft.get_next_state(state, 6, 1)
     state = draft.get_next_state(state, 9, 1)
     state = draft.get_next_state(state, 22, 1)
@@ -192,6 +194,3 @@ if __name__ == "__main__":
     print(draft.get_encoded_state(state, mode_name, map_name))
     print(draft.get_encoded_state(state, mode_name, map_name).shape)
     print(draft.get_terminal_values(state, mode_name, map_name))
-
-
-

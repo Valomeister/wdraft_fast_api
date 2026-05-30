@@ -1,10 +1,12 @@
+"""
+This module provides a function to extract useful information from a screenshot:
+picks, bans, map, turn
+"""
 import cv2
-from pathlib import Path
-import recognize_bans_cnn, recognize_picks_cnn, recognize_map_cnn
 import numpy as np
 
-import recognize_turn
-import static_data
+from recognition import recognize_bans_cnn, recognize_turn, recognize_map_cnn, recognize_picks_cnn
+from game import static_data
 
 
 # {'map': {'name': 'Dry Season', 'lang': 'ru'},
@@ -30,7 +32,7 @@ def decompose_screenshot(file_bytes, debug=False):
     bans = recognize_bans_cnn.screenshot_to_banned_brawlers(img, debug=debug)
     picks = recognize_picks_cnn.screenshot_to_picked_brawlers(img, debug=debug)
     map = recognize_map_cnn.screenshot_to_map(img, debug=debug)
-    turn = recognize_turn.screenshot_to_turn(img,debug=debug)
+    turn = recognize_turn.screenshot_to_turn(img, debug=debug)
 
     if debug:
         cv2.imshow("Эщкере", img)
@@ -81,7 +83,6 @@ def decompose_screenshot(file_bytes, debug=False):
         }
 
     if bans:
-        print(bans)
         bans_blue = [ban[1] for ban in bans if ban[0][0] < w / 2]
         bans_red = [ban[1] for ban in bans if ban[0][0] > w / 2]
 

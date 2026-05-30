@@ -1,19 +1,22 @@
+"""
+This module is the root of the FastAPI app,
+it provides API endpoints and some util functions
+"""
 import math
-import time
+import numpy as np
 from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
 
+import json
+import time
+
+import uvicorn
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
-from PIL import Image, ImageDraw, ImageFont
-import io
-import numpy as np
-import json
 
-from torch.serialization import MAP_SHARED
-
-import GreedySearch
-import static_data, MCTS
-from screenshot_decomposition import decompose_screenshot
+from engine import MCTS, GreedySearch
+from game import static_data
+from recognition.screenshot_decomposition import decompose_screenshot
 
 app = FastAPI()
 
@@ -65,6 +68,7 @@ def format_screenshot_info(screenshot_info):
             bans_mask[idx] = 1
 
     return match, match_neutral, bans_mask, turn
+
 
 @app.post("/predict")
 async def process_screenshot(file: UploadFile = File(...)):
@@ -277,8 +281,10 @@ async def handle_image(file: UploadFile = File(...),
                        theme: str | None = Form(None),
                        n: int | None = Form(None),
                        rows: int | None = Form(None),):
+
     # читаем байты
     content = await file.read()
+    start = time.time()
     if not validate_layout(layout):
         layout = "MSD" # map, state, draft
     if not theme in ["dark", "light"]:
@@ -322,13 +328,15 @@ async def handle_image(file: UploadFile = File(...),
 
     result = concat_vertical_pil(layout_arranged)
 
-    # 3. Сохраняем в память
     buf = BytesIO()
     result.save(buf, format="JPEG", quality=100)
     buf.seek(0)
 
-
+    # print(f"Server-side work took {time.time() - start} sec")
     return StreamingResponse(
         buf,
         media_type="image/jpeg"
     )
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

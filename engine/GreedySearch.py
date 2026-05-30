@@ -1,20 +1,40 @@
+"""
+This module implements an algorithm for draft:
+Evaluate all possible moves for current player and return their value
+"""
 import time
 
 import numpy as np
 import torch
 from torch import nn
 
-import encode_features
-import static_data
-from BrawlDraft import BrawlDraft
-from ValueNetwork import ValueNetwork
+from game import static_data, encode_features
+from game.BrawlDraft import BrawlDraft
+
+
+class ValueNetwork(nn.Module):
+    def __init__(self, input_size):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_size, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 1),
+            nn.Tanh()  # value в [-1, 1]
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
 
 game = BrawlDraft()
 input_size = game.encoded_state_size
 
-
 model = ValueNetwork(input_size)
-model.load_state_dict(torch.load("models/ValueNetwork/value_network_best.pt", map_location="cpu"))
+model.load_state_dict(torch.load("models/value_network.pt", map_location="cpu"))
 model.eval()
 
 def greedy_search(state, mode_name, map_name):
@@ -109,4 +129,3 @@ if __name__ == "__main__":
     end = time.perf_counter()
 
     print(f"Inference time: {end - start:.6f} sec")
-

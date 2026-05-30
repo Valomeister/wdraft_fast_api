@@ -1,8 +1,9 @@
+"""
+This module implements functionality for Monte Carlo Tree Search (MCTS)
+"""
 import numpy as np
 import math
-import encode_features
-import BrawlDraft
-import static_data
+from game import BrawlDraft, static_data, encode_features
 
 
 class PrimitiveNode:

@@ -1,7 +1,10 @@
+"""
+This module implements the identification of the current turn from a screenshot
+"""
 import cv2
 import numpy as np
 
-import recognition_utils
+from recognition import recognition_utils
 
 def get_distances(color, target_red, target_blue):
     distance_blue = np.linalg.norm(np.array(color) - np.array(target_red))

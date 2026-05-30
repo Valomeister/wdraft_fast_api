@@ -1,6 +1,9 @@
+"""
+This module performs two tasks:
+- locate picks boxes
+- recognize the brawlers in those boxes
+"""
 import time
-
-import recognition_utils
 import cv2
 import numpy as np
 import torch
@@ -8,6 +11,8 @@ import torch.nn.functional as F
 import torch.nn as nn
 from torchvision import transforms
 from pathlib import Path
+
+from recognition import recognition_utils
 
 CNN_INPUT_SIZE = 125  # размер входа CNN
 
@@ -49,7 +54,7 @@ IMG_SIZE = 125
 REGION_SIZE = 180
 
 device = torch.device("cpu")
-checkpoint = torch.load("models/character_cnn.pth", map_location=device)
+checkpoint = torch.load("models/brawler_classifier.pth", map_location=device)
 classes = checkpoint["classes"]
 
 num_classes = len(classes)
